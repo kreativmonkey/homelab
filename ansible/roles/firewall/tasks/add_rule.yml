@@ -1,0 +1,7 @@
+---
+- name: Add rule for port {{ __fwrule.port }}
+  community.general.ufw:
+    rule: "{{ __fwrule.rule | default('allow') }}"
+    port: "{{ __fwrule.port }}"
+  become: true
+  notify: Reload ufw

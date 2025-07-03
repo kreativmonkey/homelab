@@ -1,0 +1,22 @@
+---
+- name: Installing required packages for shell operations
+  ansible.builtin.package:
+    name:
+      - eza
+      - neovim
+      - git
+      - bat
+      - zoxide
+    state: present
+  become: true
+
+- name: Setup global bashrc
+  ansible.builtin.copy:
+    src: bashrc
+    dest: /etc/bash.bashrc
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+

@@ -1,0 +1,34 @@
+---
+# TODO: ADD dns rewrite for local network
+#- name: Add a conditional forwarder zone
+#  community.general.ipa_dnsrecord:
+#    name: "{{ inventory_hostname }}"
+#    type: A
+#    value: "{{ ansible_default_ipv4_addr }}"
+#    server: "{{ local_dns_server_ip }}"
+#    record_type: zone
+#    state: present
+
+- name: Set A records for {{ inventory_hostname_short }}.f4mily.net on hetzner
+  community.dns.hetzner_dns_record_set:
+    state: present
+    zone_name: f4mily.net
+    type: A
+    prefix: "{{ __prefix }}"
+    value:
+      - 91.99.145.19
+  loop_control:
+    loop_var: __prefix
+  loop: "{{ dns_record_prefix }}"
+
+- name: Set AAAA records for {{ inventory_hostname_short }}.f4mily.net on hetzner
+  community.dns.hetzner_dns_record_set:
+    state: present
+    zone_name: f4mily.net
+    type: AAAA
+    prefix: "{{ __prefix }}"
+    value:
+      - 2a01:4f8:c17:ed08::1
+  loop_control:
+    loop_var: __prefix
+  loop: "{{ dns_record_prefix }}"

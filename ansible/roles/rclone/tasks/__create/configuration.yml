@@ -1,0 +1,47 @@
+---
+- name: Configure fuse
+  ansible.builtin.lineinfile:
+    path: /etc/fuse.conf
+    regexp: '^#user_allow_other'
+    line: 'user_allow_other'
+  become: true
+
+- name: Create folders
+  ansible.builtin.file:
+    path: "{{ __folder.path }}"
+    state: directory
+    recurse: true
+    owner: "{{ rclone_uid }}"
+    group: "{{ rclone_gid }}"
+    mode: "{{ __folder.mode }}"
+  become: true
+  loop_control:
+    loop_var: __folder
+  loop:
+    - path: "{{ rclone_config_path }}"
+      mode: '0755'
+    - path: "{{ rclone_mount_folder }}/{{ rclone_mount_name }}"
+      mode: '0755'
+    - path: "{{ rclone_cache_folder }}"
+      mode: '0755'
+    - path: "{{ rclone_log_path }}"
+      mode: '0755'
+
+- name: Configure Mounts
+  ansible.builtin.template:
+    src: rclone.conf.j2
+    dest: "{{ rclone_config_path }}/rclone-{{ rclone_mount_name }}.conf"
+    owner: "{{ rclone_uid }}"
+    group: "{{ rclone_gid }}"
+    mode: '0600'
+  become: true
+
+- name: Create systemd script for mounts
+  ansible.builtin.template:
+    src: rclone.service.j2
+    dest: /etc/systemd/system/rclone-{{ rclone_mount_name }}.service
+    owner: root
+    group: root
+    mode: '0777'
+  become: true
+  notify: Restart rclone

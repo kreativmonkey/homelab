@@ -1,0 +1,42 @@
+---
+- name: Set password from existing htpasswd if present and not forcing new
+  set_fact:
+    rclone_web_password: "xKb3ZclEsr8Af"
+
+- name: Create htpasswd file for rclone web UI
+  ansible.builtin.command: >
+    htpasswd -cb -B {{ rclone_web_htpasswd_file }} {{ rclone_web_username }} {{ rclone_web_password }}
+  args:
+    creates: "{{ rclone_web_htpasswd_file }}"
+  when: rclone_web_password is defined
+
+- name: Store rclone credentials in file
+  ansible.builtin.copy:
+    dest: "{{ rclone_web_creds_file }}"
+    content: |
+      rclone-Credentials
+      rclone User Name: {{ rclone_web_username }}
+      rclone Password: {{ rclone_web_password }}
+    mode: '0600'
+
+- name: Enable firewall port for rclone
+  ansible.builtin.import_role:
+    rule: firewall
+    tasks_from: add_rule
+  vars:
+    __fwrule:
+      port: "{{ rclone_web_port }}"
+
+- name: Create systemd service for rclone web UI
+  ansible.builtin.template:
+    src: rclone-web.service.j2
+    dest: "{{ rclone_web_service_path }}"
+    mode: '0644'
+  notify: Restart rclone web
+
+- name: Enable and start rclone web systemd service
+  ansible.builtin.systemd:
+    name: "{{ rclone_web_service_name }}"
+    enabled: true
+    state: started
+    daemon_reload: true

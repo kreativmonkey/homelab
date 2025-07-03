@@ -1,0 +1,7 @@
+---
+- name: Create default networks
+  community.docker.docker_network:
+    name: socket_proxy
+    driver: bridge
+    ipam_config:
+      - subnet: 172.23.27.0/24

@@ -1,0 +1,62 @@
+- hosts: dcsrv
+  remote_user: root
+  become_user: root
+  tasks:
+    - name: Gather host facts
+      ansible.builtin.setup:
+      become: true
+
+    - name: Update operation system
+      ansible.builtin.include_role:
+        name: update
+
+    - name: Install common packages
+      ansible.builtin.package:
+        name: "{{ package.name }}"
+        state: "{{ package.state | default('present') }}"
+      loop_control:
+        loop_var: package
+      loop: "{{ packages | default([]) }}"
+
+    - name: Setup locale
+      ansible.builtin.import_role:
+        name: locale
+
+    - name: Setup hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Create users
+      ansible.builtin.include_role:
+        name: user
+      loop_control:
+        loop_var: user
+      loop: "{{ users | default([]) }}"
+
+    - name: Setup bashrc
+      ansible.builtin.include_role:
+        name: shell
+
+    - name: Setup sshd
+      ansible.builtin.include_role:
+        name: sshd
+
+    - name: Setup server tweaks
+      ansible.builtin.include_role:
+        name: sysctl
+
+    - name: Setup firewall
+      ansible.builtin.import_role:
+        name: firewall
+      tags:
+        - ufw
+
+    - name: Setup monitoring with Beszel
+      ansible.builtin.include_role:
+        name: monitoring
+
+    - name: Installing docker
+      ansible.builtin.import_role:
+        name: docker
+      tags:
+        - docker

@@ -1,0 +1,40 @@
+---
+- name: Create main user group {{ user.group.name }}
+  ansible.builtin.group:
+    name: "{{ user.group.name }}"
+    gid: "{{ user.group.gid | default(omit) }}"
+    force: "{{ user.group.force | default(omit) }}"
+    state: present
+    system: "{{ user.group.system | default(omit) }}"
+    local: "{{ user.group.local | default(omit) }}"
+  become: true
+
+- name: Make shure that all groups for {{ user.name }} are present
+  ansible.builtin.group:
+    name: "{{ group.name }}"
+    gid: "{{ group.gid | default(omit) }}"
+    state: "{{ group.state | default('present') }}"
+  loop_control:
+    loop_var: group
+  loop: "{{ user.groups | default([]) }}"
+  become: true
+
+- name: Make shure that user {{ user.name }} is {{ user.state | default('present') }}
+  ansible.builtin.user:
+    name: "{{ user.name }}"
+    comment: "{{ user.comment | default('ansible created user') }}"
+    uid: "{{ user.uid | default(omit) }}"
+    password: "{{ user.password | password_hash }}"
+    group: "{{ user.group.name | default(omit) }}"
+    groups: "{{ (user.groups | map(attribute='name') | list) | default(omit) }}"
+    create_home: "{{ user.create_home | default(true) }}"
+    state: "{{ user.state | default('present') }}"
+  become: true
+
+- name: Add GitHub user's public keys to authorized_keys
+  ansible.posix.authorized_key:
+    user: "{{ user.name }}"
+    state: present
+    key: "https://github.com/{{ user.github_name | default(user.name) }}.keys"
+  become: true
+  when: user.deploy_ssh

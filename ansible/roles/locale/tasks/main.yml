@@ -1,0 +1,13 @@
+---
+- name: Setup UTF-8
+  community.general.locale_gen:
+    name:
+      - de_DE.UTF-8
+      - en_US.UTF-8
+    state: present
+  become: true
+
+- name: Setup timezone to Europe/Berlin
+  community.general.timezone:
+    name: Europe/Berlin
+  become: true

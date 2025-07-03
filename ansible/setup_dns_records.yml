@@ -1,0 +1,9 @@
+- hosts: dcsrv
+  remote_user: root
+  module_defaults:
+    group/community.dns.hetzner:
+      hetzner_token: "{{ lookup('community.general.bitwarden', 'dns.hetzner.com.token', field='password') | first }}"
+  tasks:
+    - name: Setting records
+      ansible.builtin.import_role:
+        name: dns_record

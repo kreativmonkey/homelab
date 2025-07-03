@@ -1,0 +1,5 @@
+---
+beszel_agent: true
+beszel_agent_autoupdate: true
+beszel_agent_ssh_key: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFLdhMaCKlGrgNcPdcyFxfY1XC0Iwi+fwAQMSxfw98po'
+beszel_agent_ssh_port: 45876

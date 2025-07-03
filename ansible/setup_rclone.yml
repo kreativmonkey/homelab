@@ -1,0 +1,6 @@
+- hosts: dcsrv2.f4mily.net
+  remote_user: root
+  tasks:
+    - name: Install and Setup rclone
+      ansible.builtin.import_role:
+        name: rclone

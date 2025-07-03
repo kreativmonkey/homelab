@@ -1,0 +1,115 @@
+---
+# TODO: Create mount directory and parametrize these directory
+# TODO: Parametrize user and group for mount
+- name: Install required dependencies
+  ansible.builtin.apt:
+    name:
+      - apache2-utils
+      - fuse3
+      - unzip
+    state: present
+    update_cache: yes
+
+- name: Set rclone OS and ARCH
+  ansible.builtin.set_fact:
+    rclone_os: "{{ ansible_system | lower }}"
+    rclone_arch: >-
+      {% if ansible_architecture in ['x86_64', 'amd64'] -%}
+        amd64
+      {%- elif ansible_architecture in ['aarch64', 'arm64'] -%}
+        arm64
+      {%- elif ansible_architecture in ['armv7l'] -%}
+        arm-v7
+      {%- elif ansible_architecture in ['armv6l'] -%}
+        arm-v6
+      {%- elif ansible_architecture in ['i386', 'i686'] -%}
+        386
+      {%- else -%}
+        {{ ansible_architecture }}
+      {%- endif %}
+
+- name: Set rclone download URL
+  ansible.builtin.set_fact:
+    rclone_url: >-
+      {% if rclone_beta %}
+        https://beta.rclone.org/rclone-beta-latest-{{ rclone_os }}-{{ rclone_arch }}.zip
+      {% else %}
+        https://downloads.rclone.org/rclone-current-{{ rclone_os }}-{{ rclone_arch }}.zip
+      {% endif %}
+
+- name: Create temporary directory for rclone install
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: rclone
+  register: rclone_tmp_dir
+
+- name: Download rclone archive
+  ansible.builtin.get_url:
+    url: "{{ rclone_url }}"
+    dest: "{{ rclone_tmp_dir.path }}/rclone.zip"
+    mode: '0644'
+
+- name: Unarchive rclone
+  ansible.builtin.unarchive:
+    src: "{{ rclone_tmp_dir.path }}/rclone.zip"
+    dest: "{{ rclone_tmp_dir.path }}"
+    remote_src: yes
+
+- name: Find rclone extracted directory
+  ansible.builtin.find:
+    paths: "{{ rclone_tmp_dir.path }}"
+    file_type: directory
+    patterns: "rclone*{{ rclone_os }}*{{ rclone_arch }}"
+  register: rclone_extracted
+
+- name: Make shure bin_path is present
+  ansible.builtin.file:
+    path: "{{ __rclone.bin_path | basename }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+    recurse: true
+  become: true
+
+- name: Copy rclone binary
+  ansible.builtin.copy:
+    src: "{{ item.path }}/rclone"
+    dest: "{{ __rclone.bin_path }}"
+    mode: '0755'
+    owner: root
+    group: root
+    remote_src: yes
+  with_items: "{{ rclone_extracted.files }}"
+  when: rclone_extracted.matched > 0
+
+- name: Make shure man_path is present
+  ansible.builtin.file:
+    path: "{{ __rclone.man_path | basename }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+    recurse: true
+  become: true
+
+- name: Copy rclone man page
+  ansible.builtin.copy:
+    src: "{{ item.path }}/rclone.1"
+    dest: "{{ __rclone.man_path }}"
+    mode: '0644'
+    owner: root
+    group: root
+    remote_src: yes
+  with_items: "{{ rclone_extracted.files }}"
+  when: rclone_extracted.matched > 0
+
+- name: Update man database (if mandb is available)
+  command: mandb
+  register: mandb_result
+  ignore_errors: yes
+
+- name: Remove temporary directory
+  file:
+    path: "{{ rclone_tmp_dir.path }}"
+    state: absent
