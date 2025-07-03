@@ -1,0 +1,13 @@
+users:
+  - name: kreativmonkey
+    uid: 1000
+    password: "{{ lookup('community.general.bitwarden', 'ServerUser', field='password') | first }}"
+    shell: /bin/bash
+    group:
+      name: kreativmonkey
+      gid: 1000
+    groups:
+      - name: sudo
+      - name: docker
+    create_home: true
+    deploy_ssh: true

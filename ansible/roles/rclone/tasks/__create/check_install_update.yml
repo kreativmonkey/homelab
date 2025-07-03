@@ -1,0 +1,30 @@
+---
+- name: Check existing rclone installation
+  command: rclone --version
+  register: rclone_current
+  changed_when: false
+  ignore_errors: true
+
+- name: Set installed version fact
+  set_fact:
+    installed_version: "{{ rclone_current.stdout_lines[0] | regex_search('v[0-9]+\\.[0-9]+\\.[0-9]+') }}"
+  when: rclone_current.rc == 0
+
+- name: Fetch latest version metadata
+  uri:
+    url: "{% if rclone_beta %}https://beta.rclone.org/version.txt{% else %}https://downloads.rclone.org/version.txt{% endif %}"
+    return_content: yes
+  register: rclone_latest
+
+- name: Set target version
+  set_fact:
+    target_version: "{{ rclone_latest.content.strip() }}"
+  when: rclone_latest.status == 200
+
+- name: Skip installation
+  ansible.builtin.debug:
+    msg: >-
+        rclone {{ installed_version }} up to date (latest version {{ target_version }}), will skip update
+  when:
+    - installed_version is defined
+    - (installed_version | default('none')) in target_version

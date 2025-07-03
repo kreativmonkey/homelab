@@ -1,0 +1,13 @@
+#SPDX-License-Identifier: BSD-3-Clause
+galaxy_info:
+  author: kreativmonkey
+  description: Configure shell environment settings such as bashrc
+
+  license: BSD-3-Clause
+
+  min_ansible_version: 2.11
+
+  galaxy_tags: []
+
+  dependencies: []
+

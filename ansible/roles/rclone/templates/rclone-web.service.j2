@@ -1,0 +1,13 @@
+[Unit]
+Description=Rclone Web GUI
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory={{ rclone_web_bin_dir }}
+ExecStart={{ __rclone.bin_path }} rcd --rc-web-gui --rc-web-gui-no-open-browser --rc-addr :{{ rclone_web_port }} --rc-htpasswd {{ rclone_web_htpasswd_file }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

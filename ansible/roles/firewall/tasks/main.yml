@@ -1,0 +1,53 @@
+---
+- name: Install ufw firewall
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  become: true
+
+- name: Default deny incoming connections
+  community.general.ufw:
+    default: deny
+    direction: incoming
+  become: true
+  notify: Reload ufw
+
+- name: Default allow outgoing connections
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+  become: true
+  notify: Reload ufw
+
+- name: Allow connection from local network
+  community.general.ufw:
+    rule: allow
+    src: 192.168.10.0/24
+  become: true
+  notify: Reload ufw
+  when: ansible_default_ipv4.address is ansible.utils.in_network('192.168.10.0/24')
+
+- name: Protect ssh connection
+  community.general.ufw:
+    rule: limit
+    port: ssh
+    proto: tcp
+  become: true
+  notify: Reload ufw
+
+- name: Enable ssh connections
+  community.general.ufw:
+    rule: allow
+    name: "{{ ufwname }}"
+  loop_control:
+    loop_var: ufwname
+  loop:
+    - OpenSSH
+    - mosh
+  become: true
+  notify: Reload ufw
+
+- name: Enable firewall
+  community.general.ufw:
+    state: enabled
+  become: true

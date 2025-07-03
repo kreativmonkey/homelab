@@ -1,0 +1,40 @@
+[Unit]
+Description=Rclone NAS SMB
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStart={{ __rclone.bin_path }} mount {{ rclone_mount_name }}: {{ rclone_mount_folder }}/{{ rclone_mount_name }} \
+--config {{ rclone_config_path }}/rclone-{{ rclone_mount_name }}.conf \
+--log-file={{ rclone_log_path }}/rclone-{{ rclone_mount_name }}.log \
+--log-level {{ rclone_log_level }} \
+--allow-other \
+--no-modtime \
+--umask 002 \
+--user-agent home-server \
+--dir-cache-time 24h \
+--buffer-size 128M \
+--vfs-fast-fingerprint \
+--vfs-cache-mode full \
+--vfs-cache-max-age 336h \
+--cache-dir=/rclone/cache \
+--vfs-cache-max-size 896G \
+--vfs-read-chunk-size-limit 10G \
+--vfs-refresh \
+--rc \
+--rc-web-gui \
+--rc-addr :{{ rclone_web_port }} \
+--rc-web-gui-no-open-browser \
+--rc-no-auth \
+--use-mmap
+ExecStop=/bin/fusermount -uz /media/truenas
+ExecStartPost={{ __rclone.bin_path }} rc vfs/refresh recursive=true --rc-addr :{{ rclone_web_port }} _async=true
+Restart=on-abort
+User={{ rclone_uid }}
+Group={{ rclone_gid }}
+KillMode=mixed
+RestartSec=5
+
+[Install]
+WantedBy=default.target

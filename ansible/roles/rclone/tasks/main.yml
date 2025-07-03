@@ -1,0 +1,21 @@
+---
+- name: Check installed version of rclone
+  ansible.builtin.include_tasks: __create/check_install_update.yml
+
+- name: Rclone {{ 'update' if installed_version is defined else 'install' }}
+  ansible.builtin.include_tasks: __create/install.yml
+  when:
+    - installed_version is not defined
+    - (installed_version | default('none')) not in target_version
+
+- name: Configure rclone
+  ansible.builtin.include_tasks: __create/configuration.yml
+
+- name: Enable rclone service
+  ansible.builtin.systemd_service:
+    name: rclone-truenas.service
+    daemon_reload: true
+    state: started
+    enabled: true
+
+

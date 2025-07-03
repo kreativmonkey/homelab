@@ -1,0 +1,5 @@
+---
+# vars file for rclone
+__rclone:
+  bin_path: /usr/bin/rclone
+  man_path: /usr/local/share/man/man1/rclone.1 

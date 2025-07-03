@@ -1,0 +1,4 @@
+---
+- name: Restart Server
+  ansible.builtin.reboot:
+  become: true

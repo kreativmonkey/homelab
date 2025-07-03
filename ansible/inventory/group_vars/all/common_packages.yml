@@ -1,0 +1,15 @@
+packages:
+  - name: mosh
+  - name: neovim
+  - name: ca-certificates
+  - name: apt-transport-https
+  - name: curl
+  - name: gnupg
+  - name: lsb-release
+  - name: ntp
+  - name: htop
+  - name: zip
+  - name: unzip
+  - name: net-tools
+  - name: ncdu
+  - name: magic-wormhole

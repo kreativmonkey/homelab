@@ -1,0 +1,24 @@
+- hosts: localhost
+  vars:
+    api_user: "{{ lookup('community.general.bitwarden', 'db211314-fa61-4e8b-bff6-b30f00826685', search='id', field='username', result_count=1) }}"
+    api_token_id: "{{ lookup('community.general.bitwarden', 'db211314-fa61-4e8b-bff6-b30f00826685', search='id', field='token_id', result_count=1) }}"
+    api_token_secret: "{{ lookup('community.general.bitwarden', 'db211314-fa61-4e8b-bff6-b30f00826685', search='id', field='password', result_count=1) }}"
+  tasks:
+    - name: Get information from proxmox
+      community.general.proxmox_vm_info:
+        api_host: 192.168.10.10
+        api_user: "{{ api_user | first }}"
+        api_token_id: "{{ api_token_id | first }}"
+        api_token_secret: "{{ api_token_secret | first }}"
+        config: current
+        network: true
+        vmid: 152
+      register: __vm_info
+
+    - name: Show information of vm
+      ansible.builtin.debug:
+        msg: "Die Netzwerk MAC Addresse lautet: {{ __network.hwaddr }}"
+      loop_control:
+        loop_var: __network
+      loop: "{{ __vm_info.proxmox_vms[0].network }}"
+      when: __network.name == 'eth0'

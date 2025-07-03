@@ -1,0 +1,94 @@
+---
+- name: Install aptitude
+  ansible.builtin.package:
+     name: aptitude
+     state: present
+     update_cache: true
+  become: true
+
+- name: Make shure docker is not installed local
+  ansible.builtin.package:
+    name:
+      - docker.io
+      - docker-doc
+      - docker-compose
+      - docker-compose-v2
+      - podman-docker
+      - containerd
+      - runc
+    state: absent
+  become: true
+
+- name: Install required system packages
+  ansible.builtin.package:
+    name:
+       - apt-transport-https
+       - ca-certificates
+       - curl
+       - gnupg
+       - software-properties-common
+       - python3-pip
+       - virtualenv
+       - python3-setuptools
+    state: present
+  become: true
+
+- name: Create directory for Docker's GPG key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Download Docker GPG key to /etc/apt/keyrings/docker.asc
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+
+- name: Get DEB architecture
+  ansible.builtin.command: dpkg --print-architecture
+  changed_when: false
+  register: deb_architecture
+
+- name: Add Docker repository to APT sources
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/docker.list
+    content: |
+      deb [arch={{ deb_architecture.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Update apt and install docker-ce
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install Docker Module for Python
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Create Docker home
+  ansible.builtin.file:
+    path: /docker
+    state: directory
+    owner: root
+    group: docker
+    mode: '0755'
+  become: true

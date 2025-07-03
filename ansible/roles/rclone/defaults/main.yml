@@ -1,0 +1,22 @@
+---
+# Set to true to always generate a new password (not recommended for upgrades)
+rclone_beta: false
+
+rclone_mount_name: truenas
+rclone_mount_folder: /media
+rclone_cache_folder: /rclone/cache
+rclone_config_path: /rclone
+rclone_log_path: /var/log/rclone
+rclone_log_level: NOTICE
+rclone_uid: 1000
+rclone_gid: 1000
+
+rclone_web_force_new_password: false
+rclone_web_username: admin
+rclone_web_password_length: 13
+rclone_web_port: 55772
+rclone_web_bin_dir: /opt/rclone
+rclone_web_htpasswd_file: /opt/login.pwd
+rclone_web_creds_file: "{{ ansible_env.HOME | default('/root') }}/rclone.creds"
+rclone_web_service_name: rclone-web
+rclone_web_service_path: /etc/systemd/system/rclone-web.service

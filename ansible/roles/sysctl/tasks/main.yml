@@ -1,0 +1,10 @@
+---
+- name: Perform Server Tweaks
+  ansible.builtin.copy:
+    src: vm.conf
+    dest: /etc/sysctl.d/vm.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Restart Server

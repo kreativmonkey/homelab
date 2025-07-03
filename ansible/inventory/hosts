@@ -1,0 +1,7 @@
+[dcsrv]
+dcsrv1.f4mily.net ansible_host=192.168.10.150
+dcsrv2.f4mily.net ansible_host=192.168.10.151
+dcsrv3.f4mily.net ansible_host=192.168.10.152
+
+[proxmox]
+192.168.10.5

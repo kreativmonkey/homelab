@@ -1,0 +1,11 @@
+---
+- name: Restart rclone
+  ansible.builtin.systemd_service:
+    name: rclone-truenas.service
+    state: restarted
+
+- name: Restart rclone web
+  ansible.builtin.systemd:
+    name: "{{ rclone_web_service_name }}"
+    state: restarted
+    daemon_reload: true

@@ -1,0 +1,4 @@
+---
+dns_record_prefix:
+  - "{{ inventory_hostname_short }}"
+  - "*.{{ inventory_hostname_short }}"
