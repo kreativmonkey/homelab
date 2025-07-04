@@ -2,6 +2,6 @@ vm_hostname: dcsrv1.f4mily.net
 vm_ip: 150
 ip_addr: 192.168.10.{{ vm_ip }}
 
-roles:
- - docker
-
+config:
+  - monitoring
+  - docker

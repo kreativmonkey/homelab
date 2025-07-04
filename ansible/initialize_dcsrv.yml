@@ -25,6 +25,7 @@
     - name: Setup hostname
       ansible.builtin.hostname:
         name: "{{ inventory_hostname }}"
+        use: systemd
 
     - name: Create users
       ansible.builtin.include_role:
@@ -54,9 +55,16 @@
     - name: Setup monitoring with Beszel
       ansible.builtin.include_role:
         name: monitoring
+      when: '"monitoring" in config'
 
     - name: Installing docker
       ansible.builtin.import_role:
         name: docker
       tags:
         - docker
+      when: '"docker" in config'
+
+    - name: Install and Setup rclone
+      ansible.builtin.import_role:
+        name: rclone
+      when: '"rclone" in config'
