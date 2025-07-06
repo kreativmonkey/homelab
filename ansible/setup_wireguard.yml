@@ -1,0 +1,15 @@
+---
+- hosts: dcsrv3.f4mily.net
+  remote_user: root
+  tasks:
+    - name: Install wireguard
+      ansible.builtin.import_role:
+        name: wireguard
+        tasks_from: wireguard_install
+      when: '"wireguard" in config'
+
+    - name: Install wgdashboard
+      ansible.builtin.import_role:
+        name: wireguard
+        tasks_from: wgdashboard_install
+      when: '"wgdashboard" in config'

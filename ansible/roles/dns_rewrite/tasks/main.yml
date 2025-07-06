@@ -1,0 +1,8 @@
+- name: Add dns rewrites for {{ host }}
+  sdorra.adguard.adguard_rewrite:
+    state: present
+    server:
+      - url: "{{ adguard_host }}"
+        username: "{{ adguard_username }}"
+        password: "{{ adguard_password }}"
+    rewrites: "{{ host_domains }}"

@@ -64,6 +64,18 @@
         - docker
       when: '"docker" in config'
 
+    - name: Install wireguard
+      ansible.builtin.import_role:
+        name: wireguard
+        tasks_from: wireguard_install
+      when: '"wireguard" in config'
+
+    - name: Install wgdashboard
+      ansible.builtin.import_role:
+        name: wireguard
+        tasks_from: wgdashboard_install
+      when: '"wgdashboard" in config'
+
     - name: Install and Setup rclone
       ansible.builtin.import_role:
         name: rclone

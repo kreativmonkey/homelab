@@ -24,7 +24,7 @@
     rule: firewall
     tasks_from: add_rule
   vars:
-    __fwrule:
+    fwrule:
       port: "{{ rclone_web_port }}"
 
 - name: Create systemd service for rclone web UI

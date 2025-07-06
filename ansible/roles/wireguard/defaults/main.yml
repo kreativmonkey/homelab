@@ -1,0 +1,20 @@
+---
+wgdashboard_repo: "https://github.com/donaldzou/WGDashboard.git"
+wgdashboard_path: "/etc/wgdashboard"
+wgdashboard_src: "/etc/wgdashboard/src"
+wireguard_address: "10.0.0.1/24"
+wireguard_port: 51820
+wireguard_interface: "wg0"
+wireguard_eth: "eth0"
+wgdashboard_port: 10086
+
+# Define peers as a list of dicts
+wireguard_peers: []
+# Example:
+# wireguard_peers:
+#   - public_key: "pubkey1"
+#     allowed_ips: "10.0.0.2/32"
+#     endpoint: "peer1.example.com:51820"
+#     persistent_keepalive: 25
+#   - public_key: "pubkey2"
+#     allowed_ips: "10.0.0.3/32"

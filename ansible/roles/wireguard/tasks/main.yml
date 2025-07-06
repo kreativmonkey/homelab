@@ -1,0 +1,6 @@
+---
+- name: Install and configure WireGuard
+  import_tasks: wireguard_install.yml
+
+- name: Install and configure WGDashboard
+  import_tasks: wgdashboard_install.yml

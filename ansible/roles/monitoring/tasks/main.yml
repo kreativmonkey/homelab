@@ -29,6 +29,6 @@
     name: firewall
     tasks_from: add_rule
   vars:
-    __fwrule:
+    fwrule:
       port: "{{ beszel_agent_ssh_port }}"
       rule: "allow"
