@@ -1,6 +1,7 @@
 ---
 - name: Populate service facts
   ansible.builtin.service_facts:
+  become: true
 
 - name: Download the install-agent.sh script
   get_url:
@@ -17,11 +18,13 @@
 - name: Run the install-agent.sh script with auto-update
   shell: yes | /tmp/install-agent.sh -p {{ beszel_agent_ssh_port }} -k "{{ beszel_agent_ssh_key }}"
   when: beszel_agent_autoupdate | bool
+  become: true
   ignore_errors: false
 
 - name: Run the install-agent.sh script without auto-update
   shell: yes N | /tmp/install-agent.sh -p {{ beszel_agent_ssh_port }} -k "{{ beszel_agent_ssh_key }}"
   when: not beszel_agent_autoupdate | bool
+  become: true
   ignore_errors: false
 
 - name: Add firewall rule for beszel
