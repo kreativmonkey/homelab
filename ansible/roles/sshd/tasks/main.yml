@@ -14,3 +14,13 @@
     line: 'PasswordAuthentication no'
   become: true
   notify: Restart sshd
+
+- name: Disable root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+    state: present
+    backup: yes
+  become: true
+  notify: Restart sshd
