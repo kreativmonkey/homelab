@@ -1,4 +1,5 @@
-- hosts: dcsrv
+- name: Setup VPS hosts
+  hosts: vps
   tasks:
     - name: Gather host facts
       ansible.builtin.setup:
@@ -15,7 +16,6 @@
       loop_control:
         loop_var: package
       loop: "{{ packages | default([]) }}"
-      become: true
 
     - name: Setup locale
       ansible.builtin.import_role:
@@ -25,7 +25,6 @@
       ansible.builtin.hostname:
         name: "{{ inventory_hostname }}"
         use: systemd
-      become: true
 
     - name: Create users
       ansible.builtin.include_role:
