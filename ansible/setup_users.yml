@@ -1,0 +1,17 @@
+- name: Setup initial users
+  hosts: all
+  remote_user: root
+  tasks:
+    - name: Show users to setup
+      ansible.builtin.debug:
+        var: users
+
+    - name: Create users
+      ansible.builtin.include_role:
+        name: local_user
+        tasks_from: add
+      loop_control:
+        loop_var: user
+      loop: "{{ users | default([]) }}"
+      vars:
+        __user: "{{ user }}"

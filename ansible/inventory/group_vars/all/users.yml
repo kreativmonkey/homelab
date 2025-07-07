@@ -1,5 +1,6 @@
 users:
   - name: kreativmonkey
+    comment: Personal access user
     uid: 1000
     password: "{{ lookup('community.general.bitwarden', 'ServerUser', field='password') | first }}"
     shell: /bin/bash
@@ -10,4 +11,20 @@ users:
       - name: sudo
       - name: docker
     create_home: true
-    deploy_ssh: true
+    authorized_keys:
+      - https://github.com/kreativmonkey.keys
+    update_password: always
+  - name: ansib
+    comment: User to role out ansible tasks
+    uid: 1101
+    password: "{{ lookup('community.general.bitwarden', 'Ansible User', field='password') | first }}"
+    shell: /bin/bash
+    group:
+      name: ansible
+      gid: 1101
+    groups:
+      - name: sudo
+    create_home: true
+    update_password: always
+    authorized_keys:
+      - https://github.com/kreativmonkey.keys

@@ -1,0 +1,14 @@
+---
+__user:
+  name: testuser
+  uid: 1001
+  comment: Dies ist ein Test
+  group:
+    name: maingroup
+    gid: 1001
+  groups:
+    - name: wheel
+    - name: anothergroup
+      gid: 4711
+  home: /var/home
+  shell: /bin/sh
