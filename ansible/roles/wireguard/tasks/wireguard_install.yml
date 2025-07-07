@@ -1,13 +1,10 @@
----
-- name: Install required packages for WireGuard
+-
+  name: Install required packages for WireGuard
   ansible.builtin.apt:
     name:
       - wireguard
       - wireguard-tools
       - net-tools
-      #- iptables
-      #- iptables-persistent
-      #- netfilter-persistent
     state: present
     update_cache: yes
   become: true
@@ -20,10 +17,45 @@
     reload: yes
   become: true
 
-- name: Generate WireGuard private key
-  ansible.builtin.command: wg genkey
-  register: wg_private_key
-  changed_when: false
+- name: Check if private key exists
+  stat:
+    path: /etc/wireguard/privatekey
+  register: private_key
+
+- name: Generate private key
+  command: wg genkey
+  args:
+    chdir: /etc/wireguard
+    creates: /etc/wireguard/privatekey
+  when: not private_key.stat.exists
+  become: true
+
+- name: Set private key permissions
+  file:
+    path: /etc/wireguard/privatekey
+    owner: root
+    group: root
+    mode: 0600
+  when: not private_key.stat.exists
+  become: true
+
+- name: Generate public key
+  command: wg pubkey
+  args:
+    stdin: "{{ lookup('file', '/etc/wireguard/privatekey') }}"
+    chdir: /etc/wireguard
+    creates: /etc/wireguard/publickey
+  register: public_key_output
+  when: not private_key.stat.exists
+  become: true
+
+- name: Set public key permissions
+  file:
+    path: /etc/wireguard/publickey
+    owner: root
+    group: root
+    mode: 0644
+  when: not private_key.stat.exists
   become: true
 
 - name: Create WireGuard configuration with peers
@@ -34,7 +66,7 @@
     group: root
     mode: '0600'
   vars:
-    private_key: "{{ wg_private_key.stdout }}"
+    private_key_file: /etc/wireguard/privatekey
   become: true
 
 - name: Open WireGuard-Port

@@ -1,5 +1,5 @@
 [Interface]
-PrivateKey = {{ private_key }}
+PrivateKey = {{ lookup('file', private_key_file) }}
 Address = {{ wireguard_address }}
 SaveConfig = true
 PostUp = iptables -A FORWARD -i {{ wireguard_interface }} -j ACCEPT; iptables -A FORWARD -o {{ wireguard_interface }} -j ACCEPT; iptables -t nat -A POSTROUTING -o {{ wireguard_eth }} -j MASQUERADE;

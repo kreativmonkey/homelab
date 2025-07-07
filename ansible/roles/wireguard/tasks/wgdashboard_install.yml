@@ -1,10 +1,20 @@
----
-- name: Install required packages for WGDashboard
+-
+  name: Install required packages for WGDashboard
   ansible.builtin.apt:
     name: git
     state: present
     update_cache: yes
   become: true
+  tags:
+    - wgdashboard
+    - update
+
+- name: Check if WGDashboard is already installed
+  stat:
+    path: "{{ wgdashboard_src }}/gunicorn.pid"
+  register: wgdashboard_installed
+  tags:
+    - wgdashboard
 
 - name: Clone WGDashboard repository
   ansible.builtin.git:
@@ -13,12 +23,20 @@
     version: "HEAD"
     force: yes
   become: true
+  when: not wgdashboard_installed.stat.exists
+  tags:
+    - wgdashboard
+    - update
 
 - name: Set execute permissions for wgd.sh
   ansible.builtin.file:
     path: "{{ wgdashboard_src }}/wgd.sh"
     mode: '0755'
   become: true
+  when: not wgdashboard_installed.stat.exists
+  tags:
+    - wgdashboard
+    - update
 
 - name: Install WGDashboard
   ansible.builtin.command: ./wgd.sh install
@@ -26,6 +44,10 @@
     chdir: "{{ wgdashboard_src }}"
     creates: "{{ wgdashboard_src }}/gunicorn.pid"
   become: true
+  when: not wgdashboard_installed.stat.exists
+  tags:
+    - wgdashboard
+    - update
 
 - name: Create systemd service for WGDashboard
   ansible.builtin.template:
@@ -35,6 +57,10 @@
     group: root
     mode: '0644'
   become: true
+  when: not wgdashboard_installed.stat.exists
+  tags:
+    - wgdashboard
+    - update
 
 - name: Open firewall rule for wgdashboard {{ wgdashboard_port }}
   ansible.builtin.import_role:
@@ -43,6 +69,10 @@
   vars:
     fwrule:
       port: "{{ wgdashboard_port }}"
+  when: not wgdashboard_installed.stat.exists
+  tags:
+    - wgdashboard
+    - update
 
 - name: Enable and start WGDashboard service
   ansible.builtin.systemd:
@@ -51,3 +81,6 @@
     state: started
     daemon_reload: yes
   become: true
+  tags:
+    - wgdashboard
+    - update
