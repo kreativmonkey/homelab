@@ -5,3 +5,21 @@ ip_addr: 192.168.10.{{ vm_ip }}
 config:
   - monitoring
   - docker
+  - wireguard
+  - rclone
+
+wireguard_address: "10.7.0.{{ vm_ip }}/24"
+wireguard_port: 51830
+wireguard_peers:
+  - public_key: "yxqc4CfwbrGZqUW7Gvnl7qMrKcWqdEVSz23vmniID0E="
+    allowed_ips: "10.7.0.0/24"
+    endpoint: "91.99.145.19:51830"
+    persistent_keepalive: 25
+  - public_key: "wzx4nKnbaX1Xy87IbzQyadXQlNGf/826LHwiShIswAo="
+    endpoint: "138.199.219.116:51830"
+    allowed_ips: "10.7.0.10/32"
+    persistent_keepalive: 25
+  - public_key: VOnzFowW8thtqFy50E8hT2cG+pmOAqML6lqEf22BjCI=
+    endpoint: "192.168.10.152:51830"
+    allowed_ips: "10.7.0.152/32"
+    persistent_keepalive: 25
