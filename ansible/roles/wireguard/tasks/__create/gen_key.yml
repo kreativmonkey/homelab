@@ -1,0 +1,22 @@
+---
+- name: Check if private key exists
+  ansible.builtin.stat:
+    path: /etc/wireguard/privatekey{{ wireguard_interface }}
+  register: private_key
+
+- name: Generate private key
+  ansible.builtin.shell: wg genkey | tee privatekey{{ wireguard_interface }} | wg pubkey > publickey{{ wireguard_interface }}
+  args:
+    chdir: /etc/wireguard
+    creates: /etc/wireguard/privatekey{{ wireguard_interface }}
+  when: not private_key.stat.exists
+  become: true
+
+- name: Set key file permissions
+  ansible.builtin.file:
+    path: /etc/wireguard/privatekey{{ wireguard_interface }}
+    owner: root
+    group: root
+    mode: 0600
+  become: true
+  delay: 2

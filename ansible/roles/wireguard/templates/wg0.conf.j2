@@ -1,5 +1,5 @@
 [Interface]
-PrivateKey = {{ lookup('file', private_key_file) }}
+PrivateKey = {{ private_key }}
 Address = {{ wireguard_address }}
 SaveConfig = true
 PostUp = iptables -A FORWARD -i {{ wireguard_interface }} -j ACCEPT; iptables -A FORWARD -o {{ wireguard_interface }} -j ACCEPT; iptables -t nat -A POSTROUTING -o {{ wireguard_eth }} -j MASQUERADE;
@@ -15,5 +15,6 @@ Endpoint = {{ peer.endpoint }}
 {% endif %}
 {% if peer.persistent_keepalive is defined %}
 PersistentKeepalive = {{ peer.persistent_keepalive }}
+
 {% endif %}
 {% endfor %}

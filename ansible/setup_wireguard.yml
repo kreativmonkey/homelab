@@ -1,5 +1,5 @@
 ---
-- hosts: dcsrv3.f4mily.net
+- hosts: dcsrv
   remote_user: root
   tasks:
     - name: Install wireguard

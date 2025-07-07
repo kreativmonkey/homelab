@@ -9,6 +9,9 @@
     update_cache: yes
   become: true
 
+- name: Import key generation tasks
+  import_tasks: __create/gen_key.yml
+
 - name: Enable IPv4 forwarding
   ansible.builtin.sysctl:
     name: net.ipv4.ip_forward
@@ -17,46 +20,15 @@
     reload: yes
   become: true
 
-- name: Check if private key exists
-  stat:
-    path: /etc/wireguard/privatekey
-  register: private_key
-
-- name: Generate private key
-  command: wg genkey
-  args:
-    chdir: /etc/wireguard
-    creates: /etc/wireguard/privatekey
-  when: not private_key.stat.exists
+- name: Slurp private key
+  ansible.builtin.slurp:
+    path: /etc/wireguard/privatekey{{ wireguard_interface }}
+  register: private_key_content
   become: true
 
-- name: Set private key permissions
-  file:
-    path: /etc/wireguard/privatekey
-    owner: root
-    group: root
-    mode: 0600
-  when: not private_key.stat.exists
-  become: true
-
-- name: Generate public key
-  command: wg pubkey
-  args:
-    stdin: "{{ lookup('file', '/etc/wireguard/privatekey') }}"
-    chdir: /etc/wireguard
-    creates: /etc/wireguard/publickey
-  register: public_key_output
-  when: not private_key.stat.exists
-  become: true
-
-- name: Set public key permissions
-  file:
-    path: /etc/wireguard/publickey
-    owner: root
-    group: root
-    mode: 0644
-  when: not private_key.stat.exists
-  become: true
+- set_fact:
+    private_key: "{{ private_key_content['content'] | b64decode | replace('\n', '') }}"
+  no_log: true
 
 - name: Create WireGuard configuration with peers
   ansible.builtin.template:
@@ -65,8 +37,6 @@
     owner: root
     group: root
     mode: '0600'
-  vars:
-    private_key_file: /etc/wireguard/privatekey
   become: true
 
 - name: Open WireGuard-Port
