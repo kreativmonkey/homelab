@@ -1,0 +1,19 @@
+vm_hostname: vps.f4mily.net
+ip_addr: 91.99.145.19
+
+config:
+  - monitoring
+  - docker
+  - wireguard
+
+wireguard_address: "10.7.0.1/24"
+wireguard_port: 51830
+wireguard_peers:
+  - public_key: "VOnzFowW8thtqFy50E8hT2cG+pmOAqML6lqEf22BjCI="
+    allowed_ips: "10.7.0.152/32"
+  - public_key: "wzx4nKnbaX1Xy87IbzQyadXQlNGf/826LHwiShIswAo="
+    endpoint: "138.199.219.116:51830"
+    allowed_ips: "10.7.0.10/32"
+    persistent_keepalive: 25
+  - public_key: "l0T97ePkngmHKruCNuVDt0MbZguyTRvUTsokxop1d1Y="
+    allowed_ips: "10.7.0.2/32"

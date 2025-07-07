@@ -3,5 +3,8 @@ dcsrv1.f4mily.net ansible_host=192.168.10.150
 dcsrv2.f4mily.net ansible_host=192.168.10.151
 dcsrv3.f4mily.net ansible_host=192.168.10.152
 
+[vps]
+vps.f4mily.net ansible_host=91.99.145.19
+mail.f4mily.net ansible_host=138.199.219.116
 [proxmox]
 192.168.10.5
