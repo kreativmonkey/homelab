@@ -15,3 +15,9 @@
       loop: "{{ users | default([]) }}"
       vars:
         __user: "{{ user }}"
+
+    - name: Lock root user
+      ansible.builtin.user:
+        name: root
+        password: "!"
+        update_password: always

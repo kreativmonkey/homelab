@@ -1,4 +1,5 @@
-- hosts: dcsrv
+- name: Initial configuration of dcsrv
+  hosts: dcsrv
   tasks:
     - name: Gather host facts
       ansible.builtin.setup:
@@ -27,13 +28,13 @@
         use: systemd
       become: true
 
-    - name: Create users
-      ansible.builtin.include_role:
-        name: local_user
-        tasks_from: add
-      loop_control:
-        loop_var: user
-      loop: "{{ users | default([]) }}"
+    #- name: Create users
+    #  ansible.builtin.include_role:
+    #    name: local_user
+    #    tasks_from: add
+    #  loop_control:
+    #    loop_var: user
+    #  loop: "{{ users | default([]) }}"
 
     - name: Setup bashrc
       ansible.builtin.include_role:

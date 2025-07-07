@@ -62,15 +62,19 @@
     patterns: "rclone*{{ rclone_os }}*{{ rclone_arch }}"
   register: rclone_extracted
 
-- name: Make shure bin_path is present
+- name: Make shure reqired path are present
   ansible.builtin.file:
-    path: "{{ __rclone.bin_path | basename }}"
+    path: "{{ __required_path }}"
     state: directory
     mode: '0755'
     owner: root
     group: root
     recurse: true
   become: true
+  loop_control:
+    loop_var: __required_path
+  loop:
+    - "{{ __rclone.man_path | replace(__rclone.man_path | basename, '') }}"
 
 - name: Copy rclone binary
   ansible.builtin.copy:
